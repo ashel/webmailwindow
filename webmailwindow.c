@@ -6,9 +6,9 @@ Module Name:
 
 Abstract:
 
-	Find WebMail Window HID Device and set LED pattern.
-	
-	usage: webmailwindow.exe -c [r|g|b|rg|rb|gb|rgb|none]
+    Find WebMail Window HID Device and set LED pattern.
+    
+    usage: webmailwindow.exe -c [r|g|b|rg|rb|gb|rgb|none]
 
 Environment:
 
@@ -27,8 +27,8 @@ Environment:
 // Local macro definitions
 //****************************************************************************
 
-#define WEBMAILWINDOW_VENDERID	0x1294
-#define WEBMAILWINDOW_PRODUCTID	0x1320
+#define WEBMAILWINDOW_VENDERID  0x1294
+#define WEBMAILWINDOW_PRODUCTID 0x1320
 
 //****************************************************************************
 // Data types local to the HClient display routines
@@ -48,8 +48,8 @@ typedef struct _DEVICE_LIST_NODE
 
 //
 // Variables for handling the two different types of devices that can be loaded
-//   into the system.  PhysicalDeviceList contains all the actual HID devices
-//   attached via the USB bus. 
+//  into the system.  PhysicalDeviceList contains all the actual HID devices
+//  attached via the USB bus. 
 //
 
 static LIST               PhysicalDeviceList;
@@ -88,7 +88,7 @@ void UpdatePhysicalDeviceList()
     PHID_DEVICE                      pDevice;
     INT                              iIndex;
     PDEVICE_LIST_NODE                listNode;
-	
+    
     //
     // Initialize the device list.
     //  -- PhysicalDeviceList is for devices that are actually attached
@@ -96,7 +96,7 @@ void UpdatePhysicalDeviceList()
     //
     
     InitializeList(&PhysicalDeviceList);
-	
+    
     //
     // Begin by finding all the Physical HID devices currently attached to
     //  the system. If that fails, exit the dialog box.  
@@ -107,7 +107,7 @@ void UpdatePhysicalDeviceList()
         fprintf(stderr, "Faild to find hid devices\n");
         return;
     }
-	
+    
     //
     // For each device in the newly acquired list, create a device list
     //  node and add it the the list of physical device on the system  
@@ -127,13 +127,13 @@ void UpdatePhysicalDeviceList()
             //
             
             DestroyListWithCallback(&PhysicalDeviceList, DestroyDeviceListCallback);
-        	
+            
             CloseHidDevices(pDevice, numberDevices - iIndex);
 
             free(tempDeviceList);
             
-	        fprintf(stderr, "Faild to allocate memory for DEVICE_LIST_NODE\n");
-	        return;
+            fprintf(stderr, "Faild to allocate memory for DEVICE_LIST_NODE\n");
+            return;
         }
 
         listNode -> HidDeviceInfo = *pDevice;
@@ -164,12 +164,12 @@ PDEVICE_LIST_NODE FindWebMailWindowNode()
         
         for (;;)
         {
-        	if (currNode->HidDeviceInfo.Attributes.VendorID == WEBMAILWINDOW_VENDERID &&
-        		currNode->HidDeviceInfo.Attributes.ProductID == WEBMAILWINDOW_PRODUCTID)
-        	{
-        		return currNode;
-        	}
-			
+            if (currNode->HidDeviceInfo.Attributes.VendorID == WEBMAILWINDOW_VENDERID &&
+                currNode->HidDeviceInfo.Attributes.ProductID == WEBMAILWINDOW_PRODUCTID)
+            {
+                return currNode;
+            }
+            
             currNode = (PDEVICE_LIST_NODE) GetNextEntry(currNode);
         }
     }
@@ -181,11 +181,11 @@ BOOL SetLedPattern(PHID_DEVICE device, ULONG pattern_value)
 {
     HID_DEVICE                       writeDevice;
     BOOL                             status;
-	
+    
     ZeroMemory(&writeDevice, sizeof(writeDevice));
     
-	// Change LED pattern
-	
+    // Change LED pattern
+    
     //
     // In order to write to the device, need to get a
     //  writable handle to the device.  In this case, the
@@ -203,11 +203,11 @@ BOOL SetLedPattern(PHID_DEVICE device, ULONG pattern_value)
     
     if (status)
     {
-    	// set LED color value
-    	writeDevice.OutputData->ValueData.Value = pattern_value;
-    	
-    	Write(&writeDevice);
-    	
+        // set LED color value
+        writeDevice.OutputData->ValueData.Value = pattern_value;
+        
+        Write(&writeDevice);
+        
         CloseHidDevice(&writeDevice);
         return TRUE;
     }
@@ -221,34 +221,34 @@ BOOL SetLedPattern(PHID_DEVICE device, ULONG pattern_value)
 // parse options for led pattern. if failed, retrun -1.
 int ParseOptionsForLedPattern(ULONG argc, PCHAR argv[])
 {
-	int led_pattern = -1;
-	
-	UINT i;
-	for (i = 0; i < argc; i++)
-	{
-		if (strncmp("-c", argv[i], 2) == 0 && i + 1 < argc)
-		{
-			PCHAR pattern = argv[i + 1];
-			UINT mask = 0;
-			
-			if (strstr(pattern, "r")) {
-				mask |= 0x2;
-			}
-			if (strstr(pattern, "g")) {
-				mask |= 0x1;
-			}
-			if (strstr(pattern, "b")) {
-				mask |= 0x4;
-			}
-			if (mask > 0) {
-				led_pattern = mask;
-			} else if (strncmp("none", pattern, 4) == 0) {
-				led_pattern = 0;
-			}
-		}
-	}
-	
-	return led_pattern;
+    int led_pattern = -1;
+    
+    UINT i;
+    for (i = 0; i < argc; i++)
+    {
+        if (strncmp("-c", argv[i], 2) == 0 && i + 1 < argc)
+        {
+            PCHAR pattern = argv[i + 1];
+            UINT mask = 0;
+            
+            if (strstr(pattern, "r")) {
+                mask |= 0x2;
+            }
+            if (strstr(pattern, "g")) {
+                mask |= 0x1;
+            }
+            if (strstr(pattern, "b")) {
+                mask |= 0x4;
+            }
+            if (mask > 0) {
+                led_pattern = mask;
+            } else if (strncmp("none", pattern, 4) == 0) {
+                led_pattern = 0;
+            }
+        }
+    }
+    
+    return led_pattern;
 }
 
 
@@ -262,44 +262,44 @@ main(
     __in_ecount(argc) PCHAR argv[]
     )
 {
-	int retval = 0;
-	int led_pattern = -1;	// initialize as invalid value
-	
-	// Parse Options
-	led_pattern = ParseOptionsForLedPattern(argc, argv);
-	
-	// if LED pattern is not specified, print usage and exit
-	if (led_pattern == -1) {
+    int retval = 0;
+    int led_pattern = -1;   // initialize as invalid value
+    
+    // Parse Options
+    led_pattern = ParseOptionsForLedPattern(argc, argv);
+    
+    // if LED pattern is not specified, print usage and exit
+    if (led_pattern == -1) {
         printf("usage: webmailwindow.exe -c [r|g|b|rg|rb|gb|rgb|none]\n");
-		return 0;
-	}
-	
-	// Update HID Device List
-	UpdatePhysicalDeviceList();
-	
-	{
-		// Find WebMail Window
-		PDEVICE_LIST_NODE node = FindWebMailWindowNode();
-		
-		if (node)
-		{
-			// Set LED
-			if ( ! SetLedPattern(&node->HidDeviceInfo, led_pattern))
-			{
-				// failed to set led
-		        retval = 1;
-			}
-		}
-		else
-		{
-	        fprintf(stderr, "Cannot find Webmail Window HID Device\n");
-	        retval = 1;
-		}
-	}
-	
+        return 0;
+    }
+    
+    // Update HID Device List
+    UpdatePhysicalDeviceList();
+    
+    {
+        // Find WebMail Window
+        PDEVICE_LIST_NODE node = FindWebMailWindowNode();
+        
+        if (node)
+        {
+            // Set LED
+            if ( ! SetLedPattern(&node->HidDeviceInfo, led_pattern))
+            {
+                // failed to set led
+                retval = 1;
+            }
+        }
+        else
+        {
+            fprintf(stderr, "Cannot find Webmail Window HID Device\n");
+            retval = 1;
+        }
+    }
+    
     if ( ! IsListEmpty(&PhysicalDeviceList)) {
-	    DestroyListWithCallback(&PhysicalDeviceList, DestroyDeviceListCallback);
-	}
+        DestroyListWithCallback(&PhysicalDeviceList, DestroyDeviceListCallback);
+    }
 
     return retval;
 }
