@@ -170,6 +170,11 @@ PDEVICE_LIST_NODE FindWebMailWindowNode()
                 return currNode;
             }
             
+            if (currNode == lastNode)
+            {
+                break;
+            }
+            
             currNode = (PDEVICE_LIST_NODE) GetNextEntry(currNode);
         }
     }
